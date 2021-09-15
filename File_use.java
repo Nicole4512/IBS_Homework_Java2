@@ -3,49 +3,55 @@ package IBS_DZ2;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 public class File_use {
     static public String removePunctuations(String s) {
         String result = "";
         for (Character c : s.toCharArray()) {
-            if(c == ' '){
-                result +=c;
-            }
+
             if(Character.isLetterOrDigit(c))
                 result += c;
+            else
+                result += ' ';
         }
         return result;
     }
-
+//         ../../Favorites/textFile.txt
 
     public static void main(String[] args) {
         BufferedReader reader= new BufferedReader(new InputStreamReader(System.in));
         String fileName = null;
-        System.out.println("Пожалуйста, введите полный путь к файлу");
+        System.out.println("Пожалуйста, введите путь к файлу");
+
+
         try {
             fileName = reader.readLine();
         } catch (IOException e) {
             System.out.println("Введен некорректный пусть");
         }
+        Path paths = Path.of(fileName);
+        paths = paths.toAbsolutePath();
+        URI pat = paths.toUri();
+
 
         String content = null;
 
 
         try {
-            content = Files.lines(Paths.get(fileName)).reduce("", String::concat);
+            content = Files.lines(Paths.get(pat)).reduce("", String::concat);
         } catch (IOException e) {
             System.out.println("Неверный путь к файлу");
             e.getMessage();
 
         }
 
-        // Разделение на слова
+       //  Разделение на слова
         try {
             content = removePunctuations(content);
             content = content.toLowerCase();
@@ -56,18 +62,24 @@ public class File_use {
             e.getMessage();
         }
         String[] word = content.split(" ");
+        List<String> words = new ArrayList<String>();
+        for (String w : word) {
+            if (!w.equals("")){
+                words.add(w);
+            }
+        }
 
             // Сортировка по алфавиту и вывод на экран
-        Arrays.sort(word);
+        Collections.sort(words);
         System.out.println("Сортировка по алфавиту: ");
-        for (String w : word) {
+        for (String w : words) {
             System.out.println(w);
         }
 
 
             //Считаем, сколько раз встречается слово в файле и выводим статисику на экран
         Map<String, Integer> map = new HashMap<String, Integer>();
-        for (String w : word) {
+        for (String w : words) {
             if (!map.containsKey(w)) {
                 map.put(w, Integer.valueOf(1));
             } else {
